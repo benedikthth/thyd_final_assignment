@@ -1,0 +1,11 @@
+class Test3 {
+    static void main() {
+        if ( 1 < 2 ) {
+            if ( 2 < 3 ) {
+                writeln(1);
+                return;
+            }
+        }
+        writeln(2);
+    }
+}

@@ -1,0 +1,15 @@
+class Test5 {
+    static void main() {
+        int i, j;
+        for ( i = 0; i < 4; i++ ) {
+            writeln( 100 );
+            writeln( i );
+            for ( j = 0; j < 3; j++ ) {
+                if ( i == j ) {
+                    continue;
+                }
+                writeln( j );
+            }
+        }
+    }
+}

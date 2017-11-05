@@ -1,0 +1,21 @@
+class Test8 {
+
+    static int side_effect( int n ) {
+        writeln( 100 * n );
+        return n;
+    }
+
+    static void main() {
+        int a, b, c;
+        a = 2 || side_effect( 1 );
+        writeln( a );
+        b = 0 && side_effect( 2 );
+        writeln( b );
+        c = ! 3;
+        writeln( c );
+        a = 0 || side_effect( 3 );
+        writeln( a );
+        b = 1 && side_effect( 4 );
+        writeln( b );
+    }
+}

@@ -1,0 +1,14 @@
+class Test7 {
+    static void main() {
+        real a;
+        real b;
+        int  l;
+        a = 2.0;
+        b = a + 2.0 * 3.0;
+        writeln( b );
+        b = 5.0 - 3.0 - 2.0;
+        writeln( b );
+        b = (5.0 % 2.0) / 2.0;
+        writeln( b );
+    }
+}

@@ -1,0 +1,7 @@
+class ErrorTest3 {
+    static void main() {
+        if ( 3 < 2 ) {
+            break;
+        }
+    }
+}

@@ -1,0 +1,8 @@
+class Test4 {
+    static void main() {
+        int i;
+        for ( i = 0; i < 4; i++ ) {
+            writeln(i);
+        }
+    }
+}

@@ -1,0 +1,12 @@
+class Test {
+    int i, j;
+    real x;
+
+    static void main() {
+        int k;
+        i = 2;
+        j = 3;
+        k = i * j;
+        writeln(k);
+    }
+}

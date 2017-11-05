@@ -1,0 +1,5 @@
+class ErrorTest2 {
+    static void main() {
+        k = 1;
+    }
+}

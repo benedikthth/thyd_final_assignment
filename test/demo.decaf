@@ -1,0 +1,69 @@
+class Program {
+
+    int i, j;
+    real x;
+
+    static int factorial( int n ) {
+        if ( n <= 1 ) {
+            return 1;
+        }
+        return n * factorial ( n - 1 );
+    }
+
+    static real exponent( real b, int e ) {
+        real product;
+        int  i;
+        if ( e == 0 ) {
+            product = 1.0;
+        }
+        else {
+            if ( e > 0 ) {
+                product = b;
+                for ( i = 1; i < e; i++ ) {
+                    product = product * b;
+                }
+            }
+            else {
+                product = b;
+                for ( i = 1; i < -e; i++ ) {
+                    product = product * b;
+                }
+                product = 1.0 / product;
+            }
+        }
+        return product;
+    }
+
+    static int odd( int n ) {
+        return n % 2;
+    }
+
+
+    static void test_math() {
+        int n, m;
+        real r;
+        n = factorial( 5 );
+        r = exponent( 2.0, 10 );
+        r = exponent( 10.0, -2 );
+        r = exponent( 4.0, 0 );
+        m = odd( 3 );
+        m = odd( 2 );
+    }
+
+    static void main() {
+        int i;
+        test_math();
+        for ( i=5; i>=0; i-- ) {
+            if ( odd(i) ) {
+                continue;
+            }
+            if ( 1 + 2 * 3 != - + - 7 ) {
+               break;
+            }
+        }
+        i = 1 && (1 && 1) || 1 && !0;
+        {
+           i--;
+        }
+    }
+}

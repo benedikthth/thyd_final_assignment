@@ -1,0 +1,14 @@
+class Test6 {
+    static void main() {
+        int a;
+        int b;
+        int l;
+        a = 2;
+        b = a + 2 * 3;
+        writeln( b );
+        b = 5 - 3 - 2;
+        writeln( b );
+        b = (5 % 2) / 2;
+        writeln( b );
+    }
+}
