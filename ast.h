@@ -14,6 +14,7 @@
 
 /*stuff i do not want to lose*/
 #define FOR_LP_INCR "for_incr";
+#define FOR_LP_END "for_end";
 
 struct Data {
 
@@ -118,7 +119,34 @@ public:
 
     virtual void icg( Data& data, TAC& tac ) const override
     {
-        // To do ...
+
+        std::string and_false = data.label_name("and_false", data.label_no);
+        std::string end = data.label_name("and_end", data.label_no);
+        data.label_no ++;
+
+
+        //we need to be able to store our result.
+        std::string Value = data.tmp_variable_name( data.variable_no++);
+        tac.append(TAC::InstrType::VAR, Value);
+
+
+        // as soon as we see a non zero value, fail.
+        lhs->icg(data, tac);
+        tac.append(TAC::InstrType::EQ, data.expr_return_var, "0", and_false);
+        rhs->icg(data, tac);
+        tac.append(TAC::InstrType::EQ, data.expr_return_var, "0", and_false);
+        //if we got here we have to assign 1 to Value, and jump over the false label
+        tac.append(TAC::InstrType::ASSIGN, "1", Value);
+        tac.append(TAC::InstrType::GOTO, end);
+        //label the zero setting instruction
+        tac.label_next_instr(and_false);
+        tac.append(TAC::InstrType::ASSIGN, "0", Value);
+        //label to jump over the false condition
+        tac.label_next_instr(end);
+
+        data.expr_return_var = Value;
+        data.expr_return_type = ValueType::IntVal;
+
     }
 
 protected:
@@ -137,7 +165,31 @@ public:
 
     virtual void icg( Data& data, TAC& tac ) const override
     {
-        // To do ...
+        // // pretty much the exact same as the and, except if lhs or rhs ever are 1 then true.
+        std::string or_true = data.label_name("or_true", data.label_no);
+        std::string end = data.label_name("or_end", data.label_no);
+        data.label_no ++;
+
+        //store variable
+        std::string Value = data.tmp_variable_name(data.variable_no++);
+        tac.append(TAC::InstrType::VAR, Value);
+
+        //as soon as we see true we set the 1 to value;
+        lhs->icg(data, tac);
+        tac.append(TAC::InstrType::NE, data.expr_return_var, "0", or_true);
+        rhs->icg(data, tac);
+        tac.append(TAC::InstrType::NE, data.expr_return_var, "0", or_true);
+        //neither our expressions returned non-zero
+        tac.append(TAC::InstrType::ASSIGN, "0", Value);
+        tac.append(TAC::InstrType::GOTO, end);
+        //one of our instructions was non-zero
+        tac.label_next_instr(or_true);
+        tac.append(TAC::InstrType::ASSIGN, "1", Value);
+        tac.label_next_instr(end);
+
+        data.expr_return_var = Value;
+        data.expr_return_type ValueType::IntVal;
+
     }
 
 protected:
@@ -653,7 +705,15 @@ public:
 
     virtual void icg( Data& data, TAC& tac ) const override
     {
-      // to do ...
+      var_->icg(data, tac);
+      //looking at increment variable...
+      if(data.expr_return_type == ValueType::RealVal ){
+          tac.append( TAC::InstrType::SUB, data.expr_return_var, "1.0", data.expr_return_var);
+      } else {
+          tac.append( TAC::InstrType::SUB, data.expr_return_var, "1", data.expr_return_var);
+      }
+
+      //done
     }
 
 protected:
@@ -716,7 +776,17 @@ public:
 
     virtual void icg( Data& data, TAC& tac ) const override
     {
-        // To do ...
+        if(data.for_label_no.empty()){
+          error_msg("breaking outside of for loop");
+        } else {
+          // go to the current for-loop end..
+          int fl = data.for_label_no.top();
+          //find the label.
+          std::str label = data.label_name(FOR_LP_END, fl);
+          //goto label
+          tac.append(TAC::InstrType::GOTO, addr);
+
+        }
     }
 };
 
@@ -733,10 +803,11 @@ public:
 
     virtual void icg( Data& data, TAC& tac ) const override
     {
-        // To do ... ... how???
+        // done ... ... how???
 
         if(data.for_label.no.empty){
           // no for loops?
+          error_msg("Continue outside of for loop");
         } else {
 
           int fl = data.for_label_no.top();//pop();
@@ -744,7 +815,8 @@ public:
 
           //find the for loop incremenent adress...???
           std::string addr = data.label_name(FOR_LP_INCR, fl);
-
+          // if data.label_name works the way i think then this will work!
+          tac.append(TAC::InstrType::GOTO, addr);
 
         }
 
@@ -804,14 +876,14 @@ public:
 
     virtual void icg( Data& data, TAC& tac ) const override
     {
-        // To do ...  CHECK IF THIS IS CORRECT...
+        // done  ...  CHECK IF THIS IS CORRECT...
         //create a variable to represent the expression evaluation // edit: dont need to!
 
         // manage where to jump.
         //std::string lab_is_nzero = tac.label_name( "not_true", data.label_no );
         std::string lab_is_false = tac.label_name( "is_true", data.label_no );
         std::string lab_if_end   = tac.label_name( "end_if", data.label_no );
-        data.label_no ++; // todo: check if i have to do this above the label creation...
+        data.label_no ++; // todo: check if i have todo this above the label creation...
 
         expr->icg(data, tac);
 
@@ -827,7 +899,7 @@ public:
         // jump to the end, skip the false part!
 
         if(stm_else_ != nullptr){
-          //todo: do we need to do anything if there is no else?
+          //todo: do we need todo anything if there is no else?
           tac.label_next_instr(lab_is_false); // set a label to this intruction
           stm_else_->icg(data, tac); // do we need the data?
 
@@ -888,7 +960,7 @@ public:
         */
 
         //TODO: FIND OUT IF CORRECT
-        std::string lab_for_end = tac.label_name( "for_end", data.label_no );
+        std::string lab_for_end = tac.label_name( FOR_LP_END, data.label_no );
         std::string lab_for_eval = tac.label_name( "for_eval", data.label_no );
         std::string lab_for_inc_dec = tac.label_name( FOR_LP_INCR, data.label_no );
         data.for_label_no.push( data.label_no );
@@ -915,7 +987,7 @@ public:
 
         //out of the for loop!
         tac.label_next_instr(lab_for_end);
-        // To do [Find out how the for loop stack works]
+        //  [Find out how the for loop stack works]
         data.for_label_no.pop();
         //
     }
